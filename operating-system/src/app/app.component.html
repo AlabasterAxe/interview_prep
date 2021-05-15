@@ -1,0 +1,20 @@
+<div class="flex w-screen h-screen mx-auto">
+  <div class="flex-1 bg-green-100 overflow-auto">
+    <table>
+      <tr
+        [ngClass]="{ 'font-mono': true, 'bg-red-500': programCounter === i }"
+        *ngFor="let item of memory; let i = index; trackBy: trackByFn"
+      >
+        <td class="line-number border-r border-green-800">{{ i }}</td>
+        <td class="value">
+          <input
+            type="text"
+            [value]="memory[i] | json"
+            (change)="store(i, $event)"
+          />
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="flex-1 bg-blue-100"></div>
+</div>
