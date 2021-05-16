@@ -22,16 +22,26 @@ export class AppComponent {
   memory: Data[] = Array(MEMORY_SIZE).fill({
     type: DataType.no_data,
   });
-  registers: (Data | null)[] = [null, null, null, null];
+  registers: Data[] = [
+    {
+      type: DataType.number,
+      payload: 0,
+    },
+    { type: DataType.no_data },
+    { type: DataType.no_data },
+    { type: DataType.no_data },
+  ];
+  clockValue = true;
 
   constructor() {
     const existingMemory = localStorage.getItem('memory');
     if (existingMemory) {
       this.memory = JSON.parse(existingMemory);
     }
+    setInterval(() => {
+      this.clockValue = !this.clockValue;
+    }, 500);
   }
-
-  programCounter = 0;
 
   zeroPad = zeroPad;
 
@@ -49,13 +59,17 @@ export class AppComponent {
   }
 
   evaluateStep() {
-    const data = this.memory[this.programCounter];
+    const pc = this.registers[0];
+    if (pc?.type !== DataType.number) {
+      return;
+    }
+    const data = this.memory[pc.payload as number];
     if (data.type !== DataType.instruction) {
       return;
     }
 
     this.evaluateInstruction(data.payload as InstructionPayload);
-    this.programCounter++;
+    (pc.payload as number)++;
   }
 
   evaluateInstruction(instruction: InstructionPayload) {
@@ -93,6 +107,39 @@ export class AppComponent {
     }
   }
 
+  evaluateMultiply(payload: AddPayload) {
+    const value1 = this.registers[payload.register1] as Data;
+    const value2 = this.registers[payload.register2] as Data;
+    if (value1.type === DataType.number && value2.type === DataType.number) {
+      this.putValueAtReference(payload.dst, {
+        type: DataType.number,
+        payload: (value1.payload as number) * (value2.payload as number),
+      });
+    }
+  }
+
+  evaluateSubtract(payload: AddPayload) {
+    const value1 = this.registers[payload.register1] as Data;
+    const value2 = this.registers[payload.register2] as Data;
+    if (value1.type === DataType.number && value2.type === DataType.number) {
+      this.putValueAtReference(payload.dst, {
+        type: DataType.number,
+        payload: (value1.payload as number) - (value2.payload as number),
+      });
+    }
+  }
+
+  evaluateDivide(payload: AddPayload) {
+    const value1 = this.registers[payload.register1] as Data;
+    const value2 = this.registers[payload.register2] as Data;
+    if (value1.type === DataType.number && value2.type === DataType.number) {
+      this.putValueAtReference(payload.dst, {
+        type: DataType.number,
+        payload: (value1.payload as number) / (value2.payload as number),
+      });
+    }
+  }
+
   evaluateMove(payload: MovePayload) {
     let value: Data = { type: DataType.no_data };
     switch (payload.src.type) {
@@ -105,5 +152,9 @@ export class AppComponent {
     }
 
     this.putValueAtReference(payload.dst, value);
+  }
+
+  reset() {
+    this.registers[0] = { type: DataType.number, payload: 0 };
   }
 }

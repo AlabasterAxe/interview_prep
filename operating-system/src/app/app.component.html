@@ -2,11 +2,16 @@
   <div class="w-3/4 bg-green-100 overflow-auto">
     <table>
       <tr
-        [ngClass]="{ 'font-mono': true, 'bg-red-500': programCounter === i }"
+        [ngClass]="{
+          'font-mono': true,
+          'bg-red-500': registers[0] && registers[0].payload === i
+        }"
         *ngFor="let item of memory; let i = index; trackBy: trackByFn"
       >
-        <td class="line-number border-r border-green-800">{{ i }}</td>
-        <td class="value">
+        <td class="line-number border-r border-green-800">
+          {{ zeroPad(i, 2) }}
+        </td>
+        <td class="value p-0">
           <input
             class="w-full"
             type="text"
@@ -18,24 +23,22 @@
     </table>
   </div>
   <div class="w-1/4 bg-blue-100">
-    <button
-      class="
-        bg-blue-500
-        hover:bg-blue-700
-        text-white
-        font-bold
-        py-2
-        px-4
-        border border-blue-700
-        rounded
-      "
-      (click)="evaluateStep()"
-    >
-      Step
-    </button>
-    <p><span class="font-bold">Program Counter: </span>{{ programCounter }}</p>
+    <div class="flex items-center">
+      <button class="btn btn-blue" (click)="evaluateStep()">Step</button>
+      <button class="btn btn-blue" (click)="evaluateStep()">Run</button>
+      <button class="btn btn-blue" (click)="reset()">Reset</button>
+    </div>
+    <div class="flex">
+      <span class="font-bold">Clock: </span
+      ><span
+        class="rounded-full w-4 h-4 m-1"
+        [ngClass]="{ 'bg-black': clockValue, 'bg-white': !clockValue }"
+      ></span>
+    </div>
     <p *ngFor="let register of registers; let i = index">
-      <span class="font-bold">Register {{ i }}:</span>{{ register | json }}
+      <span class="font-bold"
+        >Register {{ i }}{{ i === 0 ? "(PC)" : "" }}: </span
+      >{{ register | json }}
     </p>
   </div>
 </div>
