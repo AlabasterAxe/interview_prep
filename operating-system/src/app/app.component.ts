@@ -1,6 +1,13 @@
 import { Component } from '@angular/core';
 import { zeroPad } from 'src/utils/zero-pad';
-import { Data, DataType } from 'src/model/model';
+import {
+  Data,
+  DataType,
+  InstructionPayload,
+  InstructionType,
+  MovePayload,
+  ReferenceType,
+} from 'src/model/model';
 
 const MEMORY_SIZE = 4;
 
@@ -38,5 +45,40 @@ export class AppComponent {
     return index;
   }
 
-  evaluateStep() {}
+  evaluateStep() {
+    const data = this.memory[this.programCounter];
+    if (data.type !== DataType.instruction) {
+      return;
+    }
+
+    this.evaluateInstruction(data.payload as InstructionPayload);
+  }
+
+  evaluateInstruction(instruction: InstructionPayload) {
+    switch (instruction.type) {
+      case InstructionType.move:
+        this.evaluateMove(instruction.payload as MovePayload);
+        break;
+    }
+  }
+
+  evaluateMove(movePayload: MovePayload) {
+    let value: Data = { type: DataType.no_data };
+    switch (movePayload.src.type) {
+      case ReferenceType.literal:
+        value = movePayload.src.value as Data;
+        break;
+      case ReferenceType.memory:
+        value = this.memory[movePayload.src.value as number];
+        break;
+    }
+
+    switch (movePayload.dst.type) {
+      case ReferenceType.literal:
+        throw 'Not Allowed';
+      case ReferenceType.memory:
+        this.memory[movePayload.dst.value as number] = value;
+        break;
+    }
+  }
 }

@@ -6,8 +6,8 @@ export enum DataType {
 }
 
 export enum InstructionType {
-  add,
-  move,
+  add = 'add',
+  move = 'move',
 }
 
 export interface AddPayload {
@@ -24,11 +24,16 @@ export enum ReferenceType {
 
 export interface Reference {
   type: ReferenceType;
-  value: number;
+
+  // if reference type is memory or register, value will be a number
+  // literal can be a data
+  value: number | Data;
 }
 
 export interface MovePayload {
   src: Reference;
+
+  // the only allowable reference types for destination are memory and register
   dst: Reference;
 }
 
@@ -39,5 +44,5 @@ export interface InstructionPayload {
 
 export interface Data {
   type: DataType;
-  payload: InstructionPayload | number | string;
+  payload?: InstructionPayload | number | string;
 }
