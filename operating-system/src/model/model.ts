@@ -7,13 +7,17 @@ export enum DataType {
 
 export enum InstructionType {
   add = 'add',
+  subtract = 'subtract',
+  multiply = 'multiply',
+  divide = 'divide',
   move = 'move',
+  jump = 'jump',
 }
 
 export interface AddPayload {
   register1: number;
   register2: number;
-  destinationAddr: number;
+  dst: Reference;
 }
 
 export enum ReferenceType {

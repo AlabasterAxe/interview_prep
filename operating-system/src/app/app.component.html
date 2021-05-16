@@ -1,5 +1,5 @@
 <div class="flex w-screen h-screen mx-auto">
-  <div class="flex-1 bg-green-100 overflow-auto">
+  <div class="w-3/4 bg-green-100 overflow-auto">
     <table>
       <tr
         [ngClass]="{ 'font-mono': true, 'bg-red-500': programCounter === i }"
@@ -17,7 +17,7 @@
       </tr>
     </table>
   </div>
-  <div class="flex-1 bg-blue-100">
+  <div class="w-1/4 bg-blue-100">
     <button
       class="
         bg-blue-500
@@ -33,5 +33,9 @@
     >
       Step
     </button>
+    <p><span class="font-bold">Program Counter: </span>{{ programCounter }}</p>
+    <p *ngFor="let register of registers; let i = index">
+      <span class="font-bold">Register {{ i }}:</span>{{ register | json }}
+    </p>
   </div>
 </div>
