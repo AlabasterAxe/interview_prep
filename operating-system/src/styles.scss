@@ -4,3 +4,7 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 @import './tailwind.css';
+
+body {
+  overscroll-behavior: none;
+}

@@ -25,15 +25,23 @@
   <div class="w-1/4 bg-blue-100">
     <div class="flex items-center">
       <button class="btn btn-blue" (click)="evaluateStep()">Step</button>
-      <button class="btn btn-blue" (click)="evaluateStep()">Run</button>
+      <button class="btn btn-blue" (click)="run()">Run</button>
       <button class="btn btn-blue" (click)="reset()">Reset</button>
     </div>
     <div class="flex">
       <span class="font-bold">Clock: </span
       ><span
-        class="rounded-full w-4 h-4 m-1"
+        class="indicator"
         [ngClass]="{ 'bg-black': clockValue, 'bg-white': !clockValue }"
       ></span>
+    </div>
+    <div class="flex">
+      <span class="font-bold">Program Status:</span
+      ><span
+        class="indicator"
+        [ngClass]="{ 'bg-green-500': runProgram, 'bg-red-500': !runProgram }"
+      ></span
+      ><span>{{ runProgram ? "Running" : "Stopped" }}</span>
     </div>
     <p *ngFor="let register of registers; let i = index">
       <span class="font-bold"

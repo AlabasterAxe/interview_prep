@@ -12,6 +12,7 @@ export enum InstructionType {
   divide = 'divide',
   move = 'move',
   jump = 'jump',
+  nop = 'nop',
 }
 
 export interface AddPayload {

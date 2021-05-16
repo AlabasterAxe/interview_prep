@@ -12,6 +12,7 @@ import {
 } from 'src/model/model';
 
 const MEMORY_SIZE = 64;
+const CLOCK_FREQUENCY = 1;
 
 @Component({
   selector: 'app-root',
@@ -32,6 +33,7 @@ export class AppComponent {
     { type: DataType.no_data },
   ];
   clockValue = true;
+  runProgram = false;
 
   constructor() {
     const existingMemory = localStorage.getItem('memory');
@@ -40,7 +42,10 @@ export class AppComponent {
     }
     setInterval(() => {
       this.clockValue = !this.clockValue;
-    }, 500);
+      if (this.runProgram) {
+        this.evaluateStep();
+      }
+    }, (1 / CLOCK_FREQUENCY) * 1000);
   }
 
   zeroPad = zeroPad;
@@ -60,11 +65,10 @@ export class AppComponent {
 
   evaluateStep() {
     const pc = this.registers[0];
-    if (pc?.type !== DataType.number) {
-      return;
-    }
     const data = this.memory[pc.payload as number];
-    if (data.type !== DataType.instruction) {
+
+    if (pc?.type !== DataType.number || data.type !== DataType.instruction) {
+      this.runProgram = false;
       return;
     }
 
@@ -79,6 +83,8 @@ export class AppComponent {
         break;
       case InstructionType.add:
         this.evaluateAdd(instruction.payload as AddPayload);
+        break;
+      case InstructionType.nop:
         break;
     }
   }
@@ -144,10 +150,13 @@ export class AppComponent {
     let value: Data = { type: DataType.no_data };
     switch (payload.src.type) {
       case ReferenceType.literal:
-        value = payload.src.value as Data;
+        value = { ...(payload.src.value as Data) };
         break;
       case ReferenceType.memory:
-        value = this.memory[payload.src.value as number];
+        value = { ...this.memory[payload.src.value as number] };
+        break;
+      case ReferenceType.register:
+        value = { ...this.registers[payload.src.value as number] };
         break;
     }
 
@@ -156,5 +165,10 @@ export class AppComponent {
 
   reset() {
     this.registers[0] = { type: DataType.number, payload: 0 };
+    this.runProgram = false;
+  }
+
+  run() {
+    this.runProgram = true;
   }
 }

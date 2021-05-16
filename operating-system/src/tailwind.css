@@ -5,3 +5,7 @@
 .btn-blue {
   @apply bg-blue-500 hover:bg-blue-700 text-white;
 }
+
+.indicator {
+  @apply rounded-full w-4 h-4 m-1;
+}
