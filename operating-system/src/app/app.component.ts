@@ -1,51 +1,8 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { zeroPad } from 'src/utils/zero-pad';
+import { Data, DataType } from 'src/model/model';
 
 const MEMORY_SIZE = 4;
-
-enum DataType {
-  instruction = 'instruction',
-  number = 'number',
-  string = 'string',
-  no_data = 'no_data',
-}
-
-enum InstructionType {
-  add,
-  move,
-}
-
-interface AddPayload {
-  register1: number;
-  register2: number;
-  destinationAddr: number;
-}
-
-enum ReferenceType {
-  memory,
-  register,
-  literal,
-}
-
-interface Reference {
-  type: ReferenceType;
-  value: number;
-}
-
-interface MovePayload {
-  src: Reference;
-  dst: Reference;
-}
-
-interface InstructionPayload {
-  type: InstructionType;
-  payload: AddPayload | MovePayload;
-}
-
-interface Data {
-  type: DataType;
-  payload: InstructionPayload | number | string;
-}
 
 @Component({
   selector: 'app-root',
@@ -53,11 +10,16 @@ interface Data {
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  constructor(private readonly cdr: ChangeDetectorRef) {}
-
   memory: Data[] = Array(MEMORY_SIZE).fill({
     type: DataType.no_data,
   });
+
+  constructor() {
+    const existingMemory = localStorage.getItem('memory');
+    if (existingMemory) {
+      this.memory = JSON.parse(existingMemory);
+    }
+  }
 
   programCounter = 0;
 
@@ -65,6 +27,7 @@ export class AppComponent {
 
   store(addr: number, event: Event) {
     this.memory[addr] = JSON.parse((event.target as HTMLInputElement).value);
+    localStorage.setItem('memory', JSON.stringify(this.memory));
   }
 
   getValue(addr: number): Data {
@@ -74,4 +37,6 @@ export class AppComponent {
   trackByFn(index: number) {
     return index;
   }
+
+  evaluateStep() {}
 }
